@@ -1176,6 +1176,7 @@ abstract class Doctrine_Query_Abstract
     {
         $cached = unserialize($cached);
         $this->_tableAliasMap = $cached[2];
+        $this->_isLimitSubqueryUsed = $cached[3]; 
         $customComponent = $cached[0];
 
         $queryComponents = array();
@@ -1236,7 +1237,7 @@ abstract class Doctrine_Query_Abstract
             }
         }
 
-        return serialize(array($customComponent, $componentInfo, $this->getTableAliasMap()));
+        return serialize(array($customComponent, $componentInfo, $this->getTableAliasMap(), $this->isLimitSubqueryUsed()));
     }
 
     /**

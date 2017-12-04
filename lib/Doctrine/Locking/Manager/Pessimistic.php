@@ -106,9 +106,16 @@ class Doctrine_Locking_Manager_Pessimistic
         $gotLock = false;
         $time = time();
 
+        $objectKey = [];
         if (is_array($key)) {
             // Composite key
+            foreach ($key as $keyName) {
+                $objectKey[] = $record->get($keyName);
+            }
             $key = implode('|', $key);
+            $objectKey = implode('|', $objectKey);
+        } else {
+            $objectKey  = $record->get($key);
         }
 
         try {
@@ -120,7 +127,7 @@ class Doctrine_Locking_Manager_Pessimistic
                                   . ' VALUES (:object_type, :object_key, :user_ident, :ts_obtained)');
 
             $stmt->bindParam(':object_type', $objectType);
-            $stmt->bindParam(':object_key', $key);
+            $stmt->bindParam(':object_key', $objectKey);
             $stmt->bindParam(':user_ident', $userIdent);
             $stmt->bindParam(':ts_obtained', $time);
 
@@ -145,7 +152,7 @@ class Doctrine_Locking_Manager_Pessimistic
                                           . ' user_ident  = :user_ident');
                     $stmt->bindParam(':ts', $time);
                     $stmt->bindParam(':object_type', $objectType);
-                    $stmt->bindParam(':object_key', $key);
+                    $stmt->bindParam(':object_key', $objectKey);
                     $stmt->bindParam(':user_ident', $lockingUserIdent);
                     $stmt->execute();
                 }
@@ -172,9 +179,16 @@ class Doctrine_Locking_Manager_Pessimistic
         $objectType = $record->getTable()->getComponentName();
         $key        = $record->getTable()->getIdentifier();
 
+        $objectKey = [];
         if (is_array($key)) {
             // Composite key
+            foreach ($key as $keyName) {
+                $objectKey[] = $record->get($keyName);
+            }
             $key = implode('|', $key);
+            $objectKey = implode('|', $objectKey);
+        } else {
+            $objectKey  = $record->get($key);
         }
 
         try {
@@ -184,7 +198,7 @@ class Doctrine_Locking_Manager_Pessimistic
                                         object_key  = :object_key  AND
                                         user_ident  = :user_ident");
             $stmt->bindParam(':object_type', $objectType);
-            $stmt->bindParam(':object_key', $key);
+            $stmt->bindParam(':object_key', $objectKey);
             $stmt->bindParam(':user_ident', $userIdent);
             $stmt->execute();
 
@@ -242,7 +256,19 @@ class Doctrine_Locking_Manager_Pessimistic
     {
         $objectType = $lockedRecord->getTable()->getComponentName();
         $key        = $lockedRecord->getTable()->getIdentifier();
-        return $this->_getLockingUserIdent($objectType, $key);
+        
+        $objectKey = [];
+        if (is_array($key)) {
+            // Composite key
+            foreach ($key as $keyName) {
+                $objectKey[] = $record->get($keyName);
+            }
+            $objectKey = implode('|', $objectKey);
+        } else {
+            $objectKey  = $record->get($key);
+        }
+
+        return $this->_getLockingUserIdent($objectType, $objectKey);
     }
 
     /**

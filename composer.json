@@ -1,5 +1,5 @@
 {
-    "name": "ozsynergy/doctrine1",
+    "name": "waytohealth/doctrine1",
     "type": "library",
     "description": "PHP5 Database ORM",
     "keywords": ["orm", "database"],

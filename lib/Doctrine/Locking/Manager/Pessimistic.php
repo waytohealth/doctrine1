@@ -261,11 +261,11 @@ class Doctrine_Locking_Manager_Pessimistic
         if (is_array($key)) {
             // Composite key
             foreach ($key as $keyName) {
-                $objectKey[] = $record->get($keyName);
+                $objectKey[] = $lockedRecord->get($keyName);
             }
             $objectKey = implode('|', $objectKey);
         } else {
-            $objectKey  = $record->get($key);
+            $objectKey  = $lockedRecord->get($key);
         }
 
         return $this->_getLockingUserIdent($objectType, $objectKey);

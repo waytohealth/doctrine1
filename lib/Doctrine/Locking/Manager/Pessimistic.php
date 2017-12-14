@@ -72,7 +72,7 @@ class Doctrine_Locking_Manager_Pessimistic
                                                    'notnull' => true,
                                                    'primary' => true);
 
-            $columns['user_ident']         = array('type'    => 'string',
+            $columns['lock_key']         = array('type'    => 'string',
                                                    'length'  => 50,
                                                    'notnull' => true);
 
@@ -93,12 +93,12 @@ class Doctrine_Locking_Manager_Pessimistic
      * Obtains a lock on a {@link Doctrine_Record}
      *
      * @param  Doctrine_Record $record     The record that has to be locked
-     * @param  mixed           $userIdent  A unique identifier of the locking user
+     * @param  mixed           $lockKey    A unique identifier for the lock.
      * @return boolean  TRUE if the locking was successful, FALSE if another user
      *                  holds a lock on this record
      * @throws Doctrine_Locking_Exception  If the locking failed due to database errors
      */
-    public function getLock(Doctrine_Record $record, $userIdent)
+    public function getLock(Doctrine_Record $record, $lockKey)
     {
         $objectType = $record->getTable()->getComponentName();
         $key        = $record->getTable()->getIdentifier();
@@ -123,12 +123,12 @@ class Doctrine_Locking_Manager_Pessimistic
             $this->conn->beginTransaction();
 
             $stmt = $dbh->prepare('INSERT INTO ' . $this->_lockTable
-                                  . ' (object_type, object_key, user_ident, timestamp_obtained)'
-                                  . ' VALUES (:object_type, :object_key, :user_ident, :ts_obtained)');
+                                  . ' (object_type, object_key, lock_key, timestamp_obtained)'
+                                  . ' VALUES (:object_type, :object_key, :lock_key, :ts_obtained)');
 
             $stmt->bindParam(':object_type', $objectType);
             $stmt->bindParam(':object_key', $objectKey);
-            $stmt->bindParam(':user_ident', $userIdent);
+            $stmt->bindParam(':lock_key', $lockKey);
             $stmt->bindParam(':ts_obtained', $time);
 
             try {
@@ -141,19 +141,19 @@ class Doctrine_Locking_Manager_Pessimistic
             }
 
             if ( ! $gotLock) {
-                $lockingUserIdent = $this->_getLockingUserIdent($objectType, $key);
-                if ($lockingUserIdent !== null && $lockingUserIdent == $userIdent) {
+                $lockingKey = $this->_getLockingKey($objectType, $key);
+                if ($lockingKey !== null && $lockingKey == $lockKey) {
                     $gotLock = true; // The requesting user already has a lock
                     // Update timestamp
                     $stmt = $dbh->prepare('UPDATE ' . $this->_lockTable 
                                           . ' SET timestamp_obtained = :ts'
                                           . ' WHERE object_type = :object_type AND'
                                           . ' object_key  = :object_key  AND'
-                                          . ' user_ident  = :user_ident');
+                                          . ' lock_key  = :lock_key');
                     $stmt->bindParam(':ts', $time);
                     $stmt->bindParam(':object_type', $objectType);
                     $stmt->bindParam(':object_key', $objectKey);
-                    $stmt->bindParam(':user_ident', $lockingUserIdent);
+                    $stmt->bindParam(':lock_key', $lockingKey);
                     $stmt->execute();
                 }
             }
@@ -170,11 +170,11 @@ class Doctrine_Locking_Manager_Pessimistic
      * Releases a lock on a {@link Doctrine_Record}
      *
      * @param  Doctrine_Record $record    The record for which the lock has to be released
-     * @param  mixed           $userIdent The unique identifier of the locking user
+     * @param  mixed           $lockKey.  The unique identifier for the lock
      * @return boolean  TRUE if a lock was released, FALSE if no lock was released
      * @throws Doctrine_Locking_Exception If the release procedure failed due to database errors
      */
-    public function releaseLock(Doctrine_Record $record, $userIdent)
+    public function releaseLock(Doctrine_Record $record, $lockKey)
     {
         $objectType = $record->getTable()->getComponentName();
         $key        = $record->getTable()->getIdentifier();
@@ -196,10 +196,10 @@ class Doctrine_Locking_Manager_Pessimistic
             $stmt = $dbh->prepare("DELETE FROM $this->_lockTable WHERE
                                         object_type = :object_type AND
                                         object_key  = :object_key  AND
-                                        user_ident  = :user_ident");
+                                        lock_key  = :lock_key");
             $stmt->bindParam(':object_type', $objectType);
             $stmt->bindParam(':object_key', $objectKey);
-            $stmt->bindParam(':user_ident', $userIdent);
+            $stmt->bindParam(':lock_key', $lockKey);
             $stmt->execute();
 
             $count = $stmt->rowCount();
@@ -211,14 +211,14 @@ class Doctrine_Locking_Manager_Pessimistic
     }
 
     /**
-     * Gets the unique user identifier of a lock
+     * Gets the unique identifier of a lock
      *
      * @param  string $objectType  The type of the object (component name)
      * @param  mixed  $key         The unique key of the object. Can be string or array
-     * @return string              The unique user identifier for the specified lock
+     * @return string              The unique identifier for the specified lock
      * @throws Doctrine_Locking_Exception If the query failed due to database errors
      */
-    private function _getLockingUserIdent($objectType, $key)
+    private function _getLockingKey($objectType, $key)
     {
         if (is_array($key)) {
             // Composite key
@@ -227,7 +227,7 @@ class Doctrine_Locking_Manager_Pessimistic
 
         try {
             $dbh = $this->conn->getDbh();
-            $stmt = $dbh->prepare('SELECT user_ident FROM ' . $this->_lockTable
+            $stmt = $dbh->prepare('SELECT lock_key FROM ' . $this->_lockTable
                                   . ' WHERE object_type = :object_type AND object_key = :object_key');
             $stmt->bindParam(':object_type', $objectType);
             $stmt->bindParam(':object_key', $key);
@@ -237,12 +237,12 @@ class Doctrine_Locking_Manager_Pessimistic
                 throw new Doctrine_Locking_Exception("Failed to determine locking user");
             }
 
-            $userIdent = $stmt->fetchColumn();
+            $lockKey = $stmt->fetchColumn();
         } catch (PDOException $pdoe) {
             throw new Doctrine_Locking_Exception($pdoe->getMessage());
         }
 
-        return $userIdent;
+        return $lockKey;
     }
 
     /**
@@ -268,7 +268,7 @@ class Doctrine_Locking_Manager_Pessimistic
             $objectKey  = $lockedRecord->get($key);
         }
 
-        return $this->_getLockingUserIdent($objectType, $objectKey);
+        return $this->_getLockingKey($objectType, $objectKey);
     }
 
     /**
@@ -278,11 +278,11 @@ class Doctrine_Locking_Manager_Pessimistic
      *
      * @param  integer $age  The maximum valid age of locks in seconds
      * @param  string  $objectType  The type of the object (component name)
-     * @param  mixed   $userIdent The unique identifier of the locking user
+     * @param  mixed   $lockKey The unique identifier of the lock
      * @return integer The number of locks that have been released
      * @throws Doctrine_Locking_Exception If the release process failed due to database errors
      */
-    public function releaseAgedLocks($age = 900, $objectType = null, $userIdent = null)
+    public function releaseAgedLocks($age = 900, $objectType = null, $lockKey = null)
     {
         $age = time() - $age;
 
@@ -294,16 +294,16 @@ class Doctrine_Locking_Manager_Pessimistic
             if ($objectType) {
                 $query .= ' AND object_type = :object_type';
             }
-            if ($userIdent) {
-                $query .= ' AND user_ident = :user_ident';
+            if ($lockKey) {
+                $query .= ' AND lock_key = :lock_key';
             }
             $stmt = $dbh->prepare($query);
             $stmt->bindParam(':age', $age);
             if ($objectType) {
                 $stmt->bindParam(':object_type', $objectType);
             }
-            if ($userIdent) {
-                $stmt->bindParam(':user_ident', $userIdent);
+            if ($lockKey) {
+                $stmt->bindParam(':lock_key', $lockKey);
             }
             $stmt->execute();
 

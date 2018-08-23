@@ -91,6 +91,10 @@ class Doctrine_PessimisticLocking_TestCase extends Doctrine_UnitTestCase
         $gotLock = $this->lockingManager->getLock($entries[1], 'michael');
         $this->assertTrue($gotLock);
 
+        // Getting a lock using the same userIdent that already has the lock should succeed
+        $gotLock = $this->lockingManager->getLock($entries[1], 'michael');
+        $this->assertTrue($gotLock);
+
         // Test release lock
         $released = $this->lockingManager->releaseLock($entries[0], 'romanb');
         $this->assertTrue($released);

@@ -141,8 +141,8 @@ class Doctrine_Locking_Manager_Pessimistic
             }
 
             if ( ! $gotLock) {
-                $lockingKey = $this->_getUserIdent($objectType, $key);
-                if ($lockingKey !== null && $lockingKey == $userIdent) {
+                $lockOwner = $this->getLockOwner($record);
+                if ($lockOwner !== null && $lockOwner == $userIdent) {
                     $gotLock = true; // The requesting user already has a lock
                     // Update timestamp
                     $stmt = $dbh->prepare('UPDATE ' . $this->_lockTable 
@@ -153,7 +153,7 @@ class Doctrine_Locking_Manager_Pessimistic
                     $stmt->bindParam(':ts', $time);
                     $stmt->bindParam(':object_type', $objectType);
                     $stmt->bindParam(':object_key', $objectKey);
-                    $stmt->bindParam(':user_ident', $lockingKey);
+                    $stmt->bindParam(':user_ident', $lockOwner);
                     $stmt->execute();
                 }
             }

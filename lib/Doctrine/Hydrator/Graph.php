@@ -256,7 +256,7 @@ abstract class Doctrine_Hydrator_Graph extends Doctrine_Hydrator_Abstract
                     } else if ( ! isset($prev[$parent][$relationAlias])) {
                         $element = $this->getElement($data, $componentName);
 
-						// [FIX] Tickets #1205 and #1237
+                        // [FIX] Tickets #1205 and #1237
                         $event->set('data', $element);
                         $listeners[$componentName]->postHydrate($event);
                         $instances[$componentName]->postHydrate($event);
@@ -409,7 +409,7 @@ abstract class Doctrine_Hydrator_Graph extends Doctrine_Hydrator_Abstract
                 $needMatches = count($inheritanceMap);
                 foreach ($inheritanceMap as $key => $value) {
                     $key = $this->_tables[$component]->getFieldName($key);
-                    if ( isset($data[$key]) && $data[$key] == $value) {
+                    if (isset($data[$key]) && $data[$key] == $value) {
                         --$needMatches;
                     }
                 }
@@ -417,12 +417,13 @@ abstract class Doctrine_Hydrator_Graph extends Doctrine_Hydrator_Abstract
                     $matchedComponents[] = $table->getComponentName();
                 }
             } else {
-                list($key, $value) = each($inheritanceMap);
-                $key = $this->_tables[$component]->getFieldName($key);
-                if ( ! isset($data[$key]) || $data[$key] != $value) {
-                    continue;
-                } else {
-                    $matchedComponents[] = $table->getComponentName();
+                foreach ($inheritanceMap as $key => $value) {
+                    $key = $this->_tables[$component]->getFieldName($key);
+                    if (!isset($data[$key]) || $data[$key] != $value) {
+                        continue;
+                    } else {
+                        $matchedComponents[] = $table->getComponentName();
+                    }
                 }
             }
         }

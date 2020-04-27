@@ -50,36 +50,36 @@ class Doctrine_Import_Builder_TestCase extends Doctrine_UnitTestCase
         $schemaTestInheritanceChild1Table = new ReflectionClass('SchemaTestInheritanceChild1Table');
         $schemaTestInheritanceChild2Table = new ReflectionClass('SchemaTestInheritanceChild2Table');
 
-        $this->assertTrue($schemaTestInheritanceParent->isSubClassOf('Doctrine_Record'));
-        $this->assertTrue($schemaTestInheritanceParent->isSubClassOf('BaseSchemaTestInheritanceParent'));
-        $this->assertTrue($schemaTestInheritanceParent->isSubClassOf('PackageSchemaTestInheritanceParent'));
-        $this->assertTrue($schemaTestInheritanceChild1->isSubClassOf('BaseSchemaTestInheritanceChild1'));
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('BaseSchemaTestInheritanceChild2'));
+        $this->assertTrue($schemaTestInheritanceParent->isSubclassOf('Doctrine_Record'));
+        $this->assertTrue($schemaTestInheritanceParent->isSubclassOf('BaseSchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceParent->isSubclassOf('PackageSchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild1->isSubclassOf('BaseSchemaTestInheritanceChild1'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('BaseSchemaTestInheritanceChild2'));
         
-        $this->assertTrue($schemaTestInheritanceChild1->isSubClassOf('SchemaTestInheritanceParent'));
-        $this->assertTrue($schemaTestInheritanceChild1->isSubClassOf('BaseSchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild1->isSubclassOf('SchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild1->isSubclassOf('BaseSchemaTestInheritanceParent'));
         
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('SchemaTestInheritanceParent'));
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('BaseSchemaTestInheritanceParent'));
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('SchemaTestInheritanceChild1'));
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('BaseSchemaTestInheritanceChild1'));
-        $this->assertTrue($schemaTestInheritanceChild2->isSubClassOf('PackageSchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('SchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('BaseSchemaTestInheritanceParent'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('SchemaTestInheritanceChild1'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('BaseSchemaTestInheritanceChild1'));
+        $this->assertTrue($schemaTestInheritanceChild2->isSubclassOf('PackageSchemaTestInheritanceParent'));
 
-        $this->assertTrue($schemaTestInheritanceParentTable->isSubClassOf('Doctrine_Table'));
-        $this->assertTrue($schemaTestInheritanceChild1Table->isSubClassOf('SchemaTestInheritanceParentTable'));
-        $this->assertTrue($schemaTestInheritanceChild1Table->isSubClassOf('PackageSchemaTestInheritanceParentTable'));
+        $this->assertTrue($schemaTestInheritanceParentTable->isSubclassOf('Doctrine_Table'));
+        $this->assertTrue($schemaTestInheritanceChild1Table->isSubclassOf('SchemaTestInheritanceParentTable'));
+        $this->assertTrue($schemaTestInheritanceChild1Table->isSubclassOf('PackageSchemaTestInheritanceParentTable'));
 
-        $this->assertTrue($schemaTestInheritanceChild2Table->isSubClassOf('SchemaTestInheritanceParentTable'));
-        $this->assertTrue($schemaTestInheritanceChild2Table->isSubClassOf('PackageSchemaTestInheritanceParentTable'));
-        $this->assertTrue($schemaTestInheritanceChild2Table->isSubClassOf('SchemaTestInheritanceChild1Table'));
-        $this->assertTrue($schemaTestInheritanceChild2Table->isSubClassOf('PackageSchemaTestInheritanceChild1Table'));
+        $this->assertTrue($schemaTestInheritanceChild2Table->isSubclassOf('SchemaTestInheritanceParentTable'));
+        $this->assertTrue($schemaTestInheritanceChild2Table->isSubclassOf('PackageSchemaTestInheritanceParentTable'));
+        $this->assertTrue($schemaTestInheritanceChild2Table->isSubclassOf('SchemaTestInheritanceChild1Table'));
+        $this->assertTrue($schemaTestInheritanceChild2Table->isSubclassOf('PackageSchemaTestInheritanceChild1Table'));
 
         # Simple Inheritance
         $schemaTestSimpleInheritanceParent = new ReflectionClass('SchemaTestSimpleInheritanceParent');
         $schemaTestSimpleInheritanceChild = new ReflectionClass('SchemaTestSimpleInheritanceChild');
 
         $this->assertTrue($schemaTestSimpleInheritanceParent->hasMethod('setTableDefinition'));
-        $this->assertTrue($schemaTestSimpleInheritanceChild->isSubClassOf('SchemaTestSimpleInheritanceParent'));
+        $this->assertTrue($schemaTestSimpleInheritanceChild->isSubclassOf('SchemaTestSimpleInheritanceParent'));
 
         # Class Table Inheritance
         $schemaTestClassTableInheritanceParent = new ReflectionClass('SchemaTestClassTableInheritanceParent');

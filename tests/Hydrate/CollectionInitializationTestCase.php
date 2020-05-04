@@ -88,4 +88,23 @@ class Doctrine_Hydrate_CollectionInitialization_TestCase extends Doctrine_UnitTe
         $this->assertEqual('112', $users[0]->Phonenumber[0]->phonenumber);
         $this->assertEqual('110', $users[0]->Phonenumber[1]->phonenumber);
     }
+
+    public function testOneToManyReverseMatching()
+    {
+        $users  = Doctrine_Query::create()
+            ->from('User u')
+            ->leftJoin('u.Phonenumber p')
+            ->having('COUNT(p.id) > 0')
+            ->groupBy('u.id')
+            ->limit(1)
+            ->execute()
+        ;
+
+        $expectedUser = $users->getFirst();
+
+        // Explicitly not load the record as the reverse matching do it for us.
+        $actualUser = $expectedUser->Phonenumber->getFirst()->get('User', false);
+
+        $this->assertIdentical($expectedUser, $actualUser);
+    }
 }

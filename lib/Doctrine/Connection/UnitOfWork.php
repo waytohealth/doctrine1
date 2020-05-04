@@ -237,10 +237,10 @@ class Doctrine_Connection_UnitOfWork extends Doctrine_Connection_Module
                 $params = array();
                 $columnNames = array();
                 foreach ($identifierMaps as $idMap) {
-                  foreach ($idMap as $fieldName => $value) {
-                    $params[] = $value;
-                    $columnNames[] = $table->getColumnName($fieldName);
-                  }
+                    foreach($idMap as $fieldName => $value) {
+                        $params[] = $value;
+                        $columnNames[] = $table->getColumnName($fieldName);
+                    }
                 }
                 $columnNames = array_unique($columnNames);
 

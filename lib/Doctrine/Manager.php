@@ -819,7 +819,7 @@ class Doctrine_Manager extends Doctrine_Configurable implements Countable, Itera
      */
     public function getConnectionDrivers()
     {
-        return $this->_connectionsDrivers;
+        return $this->_connectionDrivers;
     }
 
     /**

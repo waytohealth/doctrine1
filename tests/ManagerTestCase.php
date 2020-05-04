@@ -175,4 +175,9 @@ class Doctrine_Manager_TestCase extends Doctrine_UnitTestCase {
     }
     public function prepareData() { }
     public function prepareTables() { }
+
+    public function testGetConnectionDrivers()
+    {
+        $this->assertTrue(is_array($this->manager->getConnectionDrivers()));
+    }
 }
